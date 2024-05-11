@@ -1,0 +1,62 @@
+#配置静态资源访问路径，防止和controller的url冲突
+spring:
+  mvc:
+    static-path-pattern: /**
+    hiddenmethod:
+      filter:
+        enabled: true #启用了HiddenHttpMethodFiler过滤器，支持rest风格（表单）
+    view: #配置视图解析器
+      suffix: .html
+      prefix: /
+  web:
+    resources:
+      #指定静态资源访问的位置，如果我自己配置了这个静态资源，那么其他路径就失效了，所以干脆直接把原来的也重新配置一遍
+      static-locations: [
+        "classpath:/static/",
+        "classpath:/public/",
+        "classpath:/resources/",
+        "classpath:/META-INF/resources/" ]
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+      enabled: true
+  datasource: #配置数据源，如果没有指定useSSL=true，启动的时候会爆红，但是没有影响
+    url: jdbc:mysql://127.0.0.1:3306/springboot_vue3_project?useSSL=true&useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: Lgx1420070846@
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    druid:
+      stat-view-servlet:
+        enabled: true
+        login-username: druid
+        login-password: 123456
+        reset-enable: false
+      web-stat-filter: #配置web监控
+        enabled: true
+        url-pattern: /*
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ioc,/druid/*"
+      filter:
+        stat: #配置sql监控
+          slow-sql-millis: 1000 #单位秒，我设定为超过1秒则是慢查询
+          log-slow-sql: true #启用慢查询日志
+        wall: #配置sql防火墙
+          enabled: true
+          config:
+            drop-table-allow: false #禁止删除表
+            #select-all-column-allow: false #不允许“select * from xxx”
+server:
+  port: 8080
+  tomcat:
+    threads:
+      max: 200 #最大工作线程，默认是200
+      min-spare: 10 #最小工作线程，默认是10
+    accept-count: 200 #tomcat启动的线程达到最大值后，排队的请求个数，默认是100
+    max-connections: 2000 #最大连接数，最大并发数
+    connection-timeout: 10000 #建立连接的超时时间，单位毫秒，这里设置10秒
+mybatis-plus:
+  configuration:
+    #日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #自动驼峰配置
+    map-underscore-to-camel-case: true
